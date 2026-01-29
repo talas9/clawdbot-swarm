@@ -34,7 +34,18 @@ This project transforms ClawdBot into a hierarchical agent swarm with:
 clawdbot-swarm/
 ├── README.md                           # This file
 ├── LICENSE                             # MIT License
-└── swarm-memory-implementation-plan.md # Detailed implementation guide
+├── swarm-memory-implementation-plan.md # Detailed implementation guide
+└── swarm-cli/                          # CLI utilities for implementation
+    ├── README.md                       # CLI documentation
+    ├── package.json
+    └── src/
+        ├── index.ts                    # CLI entry point
+        └── commands/                   # Command implementations
+            ├── task-id.ts              # Task ID generation (SHA-256)
+            ├── uuid.ts                 # UUID generation
+            ├── scaffold.ts             # File scaffolding
+            ├── memory.ts               # Memory initialization
+            └── validate.ts             # Implementation validation
 ```
 
 ### Target Directory Structure (After Implementation)
@@ -96,8 +107,38 @@ clawdbot-swarm/
 ## Quick Start
 
 1. **Read the implementation plan** in [`swarm-memory-implementation-plan.md`](swarm-memory-implementation-plan.md)
-2. **Execute phases sequentially** - Each phase builds on the previous
-3. **Use capabilities as built** - Apply completed phases to accelerate subsequent work
+2. **Set up the CLI tool** (see below) for automating mechanical tasks
+3. **Execute phases sequentially** - Each phase builds on the previous
+4. **Use capabilities as built** - Apply completed phases to accelerate subsequent work
+
+### Swarm CLI Tool
+
+A CLI utility to automate mechanical tasks and reduce AI token usage during implementation:
+
+```bash
+# Install
+cd swarm-cli && npm install && npm run build
+
+# Generate task IDs (using SHA-256 strategy from debate-protocol.md)
+npm run swarm task-id "Fix authentication test"
+
+# Generate UUIDs
+npm run swarm uuid --count 5
+
+# Scaffold files from templates
+npm run swarm scaffold agent "Validator"
+npm run swarm scaffold skill "Git History"
+
+# Initialize memory structure
+npm run swarm init-memory
+
+# Validate implementation completeness
+npm run swarm validate --phase 2.5
+```
+
+See [`swarm-cli/README.md`](swarm-cli/README.md) for full documentation.
+
+**Why use the CLI?** Automates static generation (UUIDs, hashes, boilerplate), saving tokens and time. AI focuses on complex decisions, not mechanical tasks.
 
 ### Key Commands
 
@@ -110,6 +151,9 @@ mkdir -p ~/clawd/memory/metrics
 
 # Initialize graph storage
 touch ~/clawd/memory/graph.jsonl
+
+# Or use CLI tool:
+cd swarm-cli && npm run swarm init-memory --path ~/clawd
 
 # Continue with remaining phases in swarm-memory-implementation-plan.md
 ```
