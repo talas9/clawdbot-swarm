@@ -1,5 +1,5 @@
 import { mkdirSync, writeFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import chalk from 'chalk';
 
 const memoryStructure = {
@@ -55,21 +55,30 @@ export function init(options: { path?: string }): void {
   
   for (const [relativePath, content] of Object.entries(memoryStructure)) {
     const fullPath = join(basePath, relativePath);
-    const dir = fullPath.includes('/') ? fullPath.split('/').slice(0, -1).join('/') : '';
+    const dir = dirname(fullPath);
     
-    // Ensure directory exists
-    if (dir && !existsSync(dir)) {
-      mkdirSync(dir, { recursive: true });
-    }
-    
-    // Write file if it doesn't exist
-    if (existsSync(fullPath)) {
-      console.log(chalk.yellow('⊘'), 'Skipped', chalk.dim(relativePath), '(already exists)');
-      skipped++;
-    } else {
-      writeFileSync(fullPath, content, 'utf-8');
-      console.log(chalk.green('✓'), 'Created', chalk.cyan(relativePath));
-      created++;
+    try {
+      // Ensure directory exists
+      if (dir !== '.' && !existsSync(dir)) {
+        mkdirSync(dir, { recursive: true });
+      }
+      
+      // Write file if it doesn't exist
+      if (existsSync(fullPath)) {
+        console.log(chalk.yellow('⊘'), 'Skipped', chalk.dim(relativePath), '(already exists)');
+        skipped++;
+      } else {
+        writeFileSync(fullPath, content, 'utf-8');
+        console.log(chalk.green('✓'), 'Created', chalk.cyan(relativePath));
+        created++;
+      }
+    } catch (error) {
+      console.error(
+        chalk.red('Failed to create'),
+        chalk.cyan(relativePath) + ':',
+        (error as Error).message
+      );
+      process.exit(1);
     }
   }
   

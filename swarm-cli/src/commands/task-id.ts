@@ -8,7 +8,7 @@ import chalk from 'chalk';
  * 3. Normalize whitespace to single spaces
  * 4. Stem common verbs (fix/fixing/fixed → fix)
  */
-function canonicalize(text: string): string {
+export function canonicalize(text: string): string {
   // Lowercase
   let canonical = text.toLowerCase();
 
@@ -46,12 +46,20 @@ function canonicalize(text: string): string {
 }
 
 /**
- * Generate task ID using SHA-256 hash strategy
+ * Generate task ID hash from description (exported for testing)
+ */
+export function generateTaskId(description: string, full = false): string {
+  const canonical = canonicalize(description);
+  const hash = createHash('sha256').update(canonical).digest('hex');
+  return full ? hash : hash.substring(0, 16);
+}
+
+/**
+ * CLI command handler: Generate task ID using SHA-256 hash strategy
  */
 export function generate(description: string, options: { full?: boolean }): void {
   const canonical = canonicalize(description);
-  const hash = createHash('sha256').update(canonical).digest('hex');
-  const taskId = options.full ? hash : hash.substring(0, 16);
+  const taskId = generateTaskId(description, options.full);
 
   console.log(chalk.cyan('Original:'), description);
   console.log(chalk.cyan('Canonical:'), canonical);

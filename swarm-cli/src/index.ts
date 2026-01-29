@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
-import chalk from 'chalk';
 import * as taskId from './commands/task-id.js';
 import * as scaffold from './commands/scaffold.js';
 import * as validate from './commands/validate.js';

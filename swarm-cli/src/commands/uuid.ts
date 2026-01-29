@@ -2,9 +2,9 @@ import { createHash, randomBytes } from 'crypto';
 import chalk from 'chalk';
 
 /**
- * Generate UUID v4
+ * Generate UUID v4 (exported for testing)
  */
-function generateUUID(): string {
+export function generateUUID(): string {
   const bytes = randomBytes(16);
   
   // Set version (4) and variant bits
@@ -21,9 +21,9 @@ function generateUUID(): string {
 }
 
 /**
- * Generate deterministic UUID from seed
+ * Generate deterministic UUID from seed (exported for testing)
  */
-function generateDeterministicUUID(seed: string): string {
+export function generateDeterministicUUID(seed: string): string {
   const hash = createHash('sha256').update(seed).digest();
   const bytes = hash.subarray(0, 16);
   
@@ -41,7 +41,21 @@ function generateDeterministicUUID(seed: string): string {
 }
 
 export function generate(options: { count?: string; deterministic?: string }): void {
-  const count = parseInt(options.count || '1', 10);
+  let count = 1;
+  
+  if (options.count !== undefined) {
+    const parsedCount = parseInt(options.count, 10);
+    
+    if (Number.isNaN(parsedCount) || parsedCount <= 0) {
+      console.warn(
+        chalk.yellow(
+          `Invalid count "${options.count}". Count must be a positive integer. Using default of 1.`
+        )
+      );
+    } else {
+      count = parsedCount;
+    }
+  }
   
   if (options.deterministic) {
     const uuid = generateDeterministicUUID(options.deterministic);

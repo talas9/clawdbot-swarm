@@ -157,13 +157,22 @@ export function create(type: string, name: string, options: { output?: string })
     ? join(options.output, filename)
     : filename;
 
-  // Ensure directory exists
-  const dir = dirname(outputPath);
-  if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
-  }
+  try {
+    // Ensure directory exists
+    const dir = dirname(outputPath);
+    if (dir !== '.' && !existsSync(dir)) {
+      mkdirSync(dir, { recursive: true });
+    }
 
-  // Write file
-  writeFileSync(outputPath, template, 'utf-8');
-  console.log(chalk.green('✓'), 'Created', chalk.cyan(outputPath));
+    // Write file
+    writeFileSync(outputPath, template, 'utf-8');
+    console.log(chalk.green('✓'), 'Created', chalk.cyan(outputPath));
+  } catch (error) {
+    console.error(
+      chalk.red('Failed to create scaffold file at'),
+      chalk.cyan(outputPath) + ':',
+      (error as Error).message
+    );
+    process.exit(1);
+  }
 }
