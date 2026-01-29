@@ -100,15 +100,38 @@ final_importance = min(1.0, base_importance + sum(boosts) - sum(decays))
 When `memory_store` is called:
 1. Parse content for boost signals (regex patterns)
 2. Check `episode.outcome` for context boosts
-3. Query existing memories for repetition boost
+3. Query existing memories for repetition boost (with budget constraint)
 4. Calculate final importance
 5. Store with importance score
-6. If importance > 0.8, enable resurfacing
+6. If importance > 0.8, mark for potential resurfacing (Phase 4+)
 
-## CSP/1 Extension
+## Retrieval Budget (Performance Constraint)
+
+**Problem:** Without constraints, memory operations scale O(n) with growth, causing latency creep.
+
+**Solution:** Hard performance limits on all memory queries:
 
 ```
+BUDGET {
+  max_time_ms: 50,
+  max_results: 5,
+  pre_filter: true  // Filter by recency/importance before semantic search
+}
+```
+
+**Enforcement:**
+- Memory queries timeout after 50ms
+- Return top-5 results max (ranked by relevance × importance)
+- Pre-filter: Only search entries with:
+  - `current_relevance > 0.3` OR
+  - `last_accessed < 30 days ago` OR
+  - `importance > 0.7`
+
+**CSP/1 Extension:**
+
+```
+BUDGET {max_time_ms: 50, max_results: 5}
 IMPORTANCE_SIGNALS [user_emphasis, decision_point, repeated:3]
 IMPORTANCE_SCORE 0.85
-RESURFACE_ENABLED true
+RESURFACE_ENABLED false  // Phase 4+ feature
 ```
