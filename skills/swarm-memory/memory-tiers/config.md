@@ -93,7 +93,7 @@ Links: [[related_entry]]
 **Implementation:**
 ```python
 # Daily maintenance: Check access patterns in Graphiti
-results = await graphiti.search_entities(
+results = await graphiti.search(
     query="frequently accessed",
     group_ids=["recent"]
 )
@@ -232,7 +232,7 @@ TASK REQ:recall auth dependencies IN:MEM OUT:MEM_REFS
 PARAMS {"max_results": 10}
 
 # MCP server executes:
-results = await graphiti.search_edges(
+results = await graphiti.search(
     query="auth dependencies",
     num_results=10,
     rerank=True
@@ -249,19 +249,19 @@ SNIPPET uuid1:"auth.ts depends on token.ts for session handling"
 **Direct Graphiti API:**
 ```python
 # Hybrid search (semantic + keyword + graph)
-entity_results = await graphiti.search_entities(
+entity_results = await graphiti.search(
     query="authentication components",
     num_results=10
 )
 
-edge_results = await graphiti.search_edges(
+edge_results = await graphiti.search(
     query="auth dependencies",
     num_results=10,
     rerank=True  # Use cross-encoder for precision
 )
 
 # Build context subgraph
-context = await graphiti.build_context(
+context = await graphiti.search(
     entity_names=["auth.ts"],
     max_facts=20
 )
@@ -350,7 +350,7 @@ await graphiti.add_episode(
 - Boosts precision for keyword-heavy queries
 
 **Graph Traversal:**
-- Efficient subgraph extraction via `build_context()`
+- Efficient subgraph extraction via `search()` with center_node_uuid
 - Bounded depth to prevent exponential explosion
 - Temporal filtering reduces search space
 
@@ -432,7 +432,7 @@ for relation in old_relations:
 **Step 3: Validate extraction**
 ```python
 # Search for migrated entities
-results = await graphiti.search_entities(query=old_entity_name)
+results = await graphiti.search(query=old_entity_name)
 assert results[0].name == old_entity_name
 ```
 

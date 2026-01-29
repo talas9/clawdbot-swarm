@@ -137,7 +137,7 @@ await graphiti.add_episode(
 **Entity search:**
 ```python
 # Hybrid search (semantic + keyword + graph)
-results = await graphiti.search_entities(
+results = await graphiti.search(
     query="authentication files",
     num_results=10,
     group_ids=["project-auth"]
@@ -147,7 +147,7 @@ results = await graphiti.search_entities(
 
 **Relationship search:**
 ```python
-results = await graphiti.search_edges(
+results = await graphiti.search(
     query="auth dependencies",
     num_results=10
 )
@@ -156,7 +156,7 @@ results = await graphiti.search_edges(
 
 **Build context (subgraph):**
 ```python
-context = await graphiti.build_context(
+context = await graphiti.search(
     entity_names=["auth.ts"],
     max_facts=20
 )
@@ -165,7 +165,7 @@ context = await graphiti.build_context(
 
 **Point-in-time query:**
 ```python
-context = await graphiti.build_context(
+context = await graphiti.search(
     entity_names=["auth.ts"],
     max_facts=20,
     reference_time=datetime(2026, 1, 10)  # What was true on Jan 10?
@@ -199,7 +199,7 @@ DELETE r
 ### Reranking Search Results
 ```python
 # Graphiti supports reranking via cross-encoder
-results = await graphiti.search_edges(
+results = await graphiti.search(
     query="auth token flow",
     num_results=20,
     rerank=True,  # Use cross-encoder for better precision
@@ -243,13 +243,13 @@ Graphiti automatically creates:
 **Efficient:**
 ```python
 # Use group_ids for filtering (avoids full graph scan)
-results = await graphiti.search_entities(
+results = await graphiti.search(
     query="bug fixes",
     group_ids=["project-auth", "sprint-12"]
 )
 
 # Bounded context retrieval
-context = await graphiti.build_context(
+context = await graphiti.search(
     entity_names=["auth.ts"],
     max_facts=20  # Limit results
 )

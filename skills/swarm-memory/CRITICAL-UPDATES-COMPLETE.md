@@ -55,7 +55,7 @@ RETURN related.name, r.weight
 
 **After:**
 ```python
-results = await graphiti.search_edges(
+results = await graphiti.search(
     query="entity relationships",
     num_results=10,
     rerank=True
@@ -249,13 +249,13 @@ await graphiti.add_episode(
 
 ```python
 # Entity search
-results = await graphiti.search_entities(
+results = await graphiti.search(
     query="authentication components",
     num_results=10
 )
 
 # Relationship search
-results = await graphiti.search_edges(
+results = await graphiti.search(
     query="auth dependencies",
     num_results=10,
     rerank=True
@@ -266,7 +266,7 @@ results = await graphiti.search_edges(
 **Pattern:** Extract subgraph around entities
 
 ```python
-context = await graphiti.build_context(
+context = await graphiti.search(
     entity_names=["auth.ts"],
     max_facts=20
 )
@@ -276,7 +276,7 @@ context = await graphiti.build_context(
 **Pattern:** Point-in-time retrieval
 
 ```python
-context = await graphiti.build_context(
+context = await graphiti.search(
     entity_names=["auth.ts"],
     reference_time=datetime(2026, 1, 10)
 )
