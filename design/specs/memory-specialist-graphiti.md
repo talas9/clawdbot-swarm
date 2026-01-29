@@ -59,12 +59,15 @@ SOURCE <description>
 
 2. For Graphiti storage (short/medium/long):
 ```python
+from graphiti_core import EpisodeType
+
 episode_uuid = await graphiti.add_episode(
-    name=f"{tier}_{timestamp}",
+    name=f"{tier}_{timestamp}_{uuid4().hex[:8]}",
     episode_body=content,
     source_description=source,
-    reference_time=datetime.now(),
-    tags=tags
+    source=EpisodeType.message,  # Required: message, text, json, or speech
+    reference_time=datetime.now()
+    # Note: tags are added via episode_body content, not as separate parameter
 )
 ```
 
@@ -91,7 +94,8 @@ PARAMS {"max_results": 5, "min_relevance": 0.3, "days_back": 7}
 ```python
 results = await graphiti.search(
     query=topic,
-    num_results=max_results
+    num_results=max_results,
+    center_node_uuid=None  # Optional: search from specific node
 )
 ```
 
@@ -175,12 +179,15 @@ CONTEXT session handling
 
 **Alternative:**
 ```python
-# Direct relationship creation (if supported by Graphiti API)
-# May need to create as episode for temporal tracking
+from graphiti_core import EpisodeType
+
+# Create episode to establish relationship (Graphiti extracts entities/relations)
 episode_uuid = await graphiti.add_episode(
-    name="relationship_link",
+    name=f"link_{entity1}_{entity2}_{uuid4().hex[:8]}",
     episode_body=f"{entity1} is related to {entity2} through {context}",
-    source_description="Explicit link creation"
+    source_description="Explicit link creation",
+    source=EpisodeType.text,
+    reference_time=datetime.now()
 )
 ```
 
@@ -332,10 +339,13 @@ RATIONALE No results above relevance threshold
 **Memory Specialist processes:**
 1. Store as episode:
 ```python
+from graphiti_core import EpisodeType
+
 episode_uuid = await graphiti.add_episode(
-    name="jwt_race_condition_note",
+    name=f"jwt_race_condition_note_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
     episode_body="JWT refresh tokens have a race condition that needs fixing",
     source_description="User note about authentication bug",
+    source=EpisodeType.message,
     reference_time=datetime.now()
 )
 ```
@@ -358,7 +368,11 @@ RATIONALE Stored with automatic entity and relationship extraction
 **Memory Specialist processes:**
 1. Search Graphiti:
 ```python
-results = await graphiti.search("auth issues", num_results=5)
+results = await graphiti.search(
+    query="auth issues",
+    num_results=5,
+    center_node_uuid=None
+)
 ```
 
 2. Graphiti returns:
