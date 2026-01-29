@@ -94,7 +94,7 @@ clawdbot-swarm/
 | **0.5** | **Implementation Utilities - CLI tool for automation** | **30 min** |
 | **1** | Specialist Agents - Memory, File, Web, Tool specialists | 45 min |
 | **2** | Memory Tiers - Ultra-short, short, medium, long-term memory | 60 min |
-| **2.5** | **Dialectic Layer - Advocate/Critic debate system** | **45 min** |
+| **2.5** | **Dialectic Layer - Advocate/Critic debate system** | **50 min** |
 | **3** | Orchestrator Modifications - Role hierarchy and delegation | 45 min |
 | **4** | CSP/1 Parser - Protocol parsing utilities | 30 min |
 | **5** | Memory Maintenance - Cron jobs for decay and optimization | 30 min |
