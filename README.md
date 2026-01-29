@@ -1,7 +1,7 @@
 # ClawdBot Swarm
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.1-blue.svg)](https://github.com/talas9/clawdbot-swarm)
+[![Version](https://img.shields.io/badge/version-1.2-blue.svg)](https://github.com/talas9/clawdbot-swarm)
 [![Status](https://img.shields.io/badge/status-implementation--ready-green.svg)](https://github.com/talas9/clawdbot-swarm/blob/main/swarm-memory-implementation-plan.md)
 
 A hierarchical agent swarm memory architecture for ClawdBot/Moltbot self-modification.
@@ -11,14 +11,15 @@ A hierarchical agent swarm memory architecture for ClawdBot/Moltbot self-modific
 | Property | Value |
 |----------|-------|
 | **Name** | ClawdBot Swarm |
-| **Version** | 1.1 |
+| **Version** | 1.2 |
 | **Repository** | [github.com/talas9/clawdbot-swarm](https://github.com/talas9/clawdbot-swarm) |
 | **Owner** | Mohammed Talas ([@talas9](https://github.com/talas9)) |
 | **License** | [MIT License](LICENSE) |
 | **Target** | ClawdBot/Moltbot self-modification |
-| **Estimated Implementation** | 5-7 hours (autonomous execution) |
+| **Estimated Implementation** | 5.5-7.5 hours (autonomous execution) |
 | **Language** | TypeScript, Markdown |
 | **Category** | AI Agent Architecture, Memory Systems |
+| **Last Updated** | 2026-01-29 (agent debate consensus + validation strategy) |
 
 ## Overview
 
@@ -74,7 +75,7 @@ clawdbot-swarm/
 
 | Phase | Description | Duration |
 |-------|-------------|----------|
-| **0.1a** | Task Router (Soft) - Pattern-based task classification | 15 min |
+| **0.1a** | Task Router + Project Context (Soft) - AGENTS.md implementation | 35-40 min |
 | **0.1b** | Task Router (Hard) - Code-based enforcement (optional) | 30 min |
 | **0.2-0.4** | Foundation - Swarm skill directory and CSP/1 protocol | 15 min |
 | **1** | Specialist Agents - Memory, File, Web, Tool specialists | 45 min |
@@ -85,7 +86,9 @@ clawdbot-swarm/
 | **6** | Integration & Testing - End-to-end validation | 45 min |
 | **7** | Bootstrapping - Self-application of capabilities | Ongoing |
 
-**Total Estimated Time:** 5-7 hours (autonomous execution)
+**Total Estimated Time:** 5.5-7.5 hours (autonomous execution)
+
+**v1.2 Update:** Incorporated agent debate consensus (task routing + project context) and user assessment (pattern validation, false positive monitoring, architecture-specific adjustments).
 
 ## Quick Start
 

@@ -1,9 +1,10 @@
 # Agent Swarm Memory Architecture — Clawdbot Implementation Plan
 
-**Version:** 1.1  
+**Version:** 1.2  
 **Target:** Clawdbot/Moltbot self-modification  
 **Owner:** Mohammed Talas (@talas9)  
-**Estimated Time:** 5-7 hours (autonomous execution)
+**Estimated Time:** 5.5-7.5 hours (autonomous execution)  
+**Updated:** 2026-01-29 (incorporated agent debate consensus + user assessment)
 
 ---
 
@@ -19,52 +20,235 @@ After each phase, **use the capabilities you just built** to assist with subsequ
 
 ---
 
-## PHASE 0: FOUNDATION (60 min)
+## IMPLEMENTATION PHILOSOPHY (v1.2 Update)
 
-### 0.1a Task Router — Soft Enforcement (15 min)
+### Agent Debate Consensus (2026-01-29)
 
-**Purpose:** Prevent "lazy orchestrator" syndrome with deterministic task classification.
+Two Claude Opus 4.5 agents debated implementation priorities:
 
-**Create:** `~/clawd/skills/swarm-memory/router.md` (see `router.md` in repo root for full spec)
+**Agent Alpha (Pragmatist):** Minimal viable approach, validate before scaling  
+**Agent Beta (Architect):** Build robust foundation, prevent technical debt
 
-**Key Points:**
+**Consensus Reached:**
+- **Phase 0.1a:** Implement in AGENTS.md (not skill directory) for fast iteration
+- **Project context:** Load-bearing for multi-project programmer workflow (Beta's requirement)
+- **Validation:** Test against real session history (5-10 tagged examples)
+- **All phases retained:** Full architecture kept, no skips (per user decision)
+
+### User Assessment Integration
+
+**Strengths Confirmed:**
+- Deterministic routing approach prevents "lazy orchestrator" syndrome
+- Comprehensive edge case handling in router specification
+- Proper integration strategy with feature flags and rollback plans
+
+**Critical Considerations Added:**
+- **Pattern validation:** Real session history > synthetic samples
+- **False positive monitoring:** Weekly review cycle, log all routing decisions
+- **Architecture-specific adjustments:** Map Clawdbot message flow before Phase 0.1b
+- **Feature-flagged implementation:** Safe rollback path for hard routing
+
+**Philosophy:** Build minimum that validates the pattern (Phase 0.1a), then scale with confidence (remaining phases). Conservative defaults with explicit monitoring ensure quality over speed.
+
+---
+
+## PHASE 0: FOUNDATION (65-70 min)
+
+### 0.1a Task Router + Project Context — Soft Enforcement (35-40 min)
+
+**Purpose:** Prevent "lazy orchestrator" syndrome with deterministic task classification and multi-project context tracking.
+
+**Implementation Location:** Append to `~/clawd/AGENTS.md` (NOT skill directory for v0 - fast iteration)
+
+**Reference:** See `router.md` in repo root for full specification and TypeScript implementation
+
+#### Part 1: Task Routing Rules (15 min)
+
+Add to `AGENTS.md`:
+
+```markdown
+## Task Routing
+
+BEFORE processing any request, classify:
+
+### ANSWER mode (direct response)
+- Starts with: What/Why/How/Explain/Should
+- AND no file paths, URLs, code blocks
+- → Respond directly
+
+### ACTION mode (tool use)
+- Contains: file extensions (.ts/.md/.py), paths (src/, ~/), URLs
+- OR keywords: fix/debug/implement/create/search/run/remember
+- → Use tools, don't just talk
+
+DEFAULT: When uncertain → ACTION
+```
+
+**Rationale:**
 - **ANSWER precedence:** Question patterns + no external refs → direct response
-- **ACTION triggers:** File paths, keywords (fix, search, run), URLs → swarm mode
-- **Default:** When in doubt → ACTION mode
-- **Logging:** All routing decisions logged to `memory/YYYY-MM-DD.md`
+- **ACTION triggers:** File paths, keywords, URLs → force swarm mode
+- **Default bias:** When uncertain → ACTION (programmer workflow = mostly doing, not discussing)
 
-**Validation:**
-1. Test against 20+ sample tasks
-2. Verify >90% correct routing
-3. Document edge cases
-4. Iterate on patterns
+#### Part 2: Project Context Tracking (5 min)
+
+Add to `AGENTS.md`:
+
+```markdown
+## Project Context
+
+When working on a task, identify the active project:
+- **Explicit:** User mentions project name or path contains project identifier
+- **Implicit:** Most recent project from conversation
+- **Switch:** Project change = confirm new context (don't carry assumptions)
+- **Unknown:** ASK before proceeding with file operations
+
+Tag all memory entries: `[project:name]` or `[project:unknown]`
+```
+
+**Rationale (from Agent Beta):**
+- Programmer switches projects 5-15x/day
+- Explicit > implicit for code work
+- Wrong project = subtle context pollution (trust erosion)
+- Capturing info user already has mentally
+
+**Key Distinction:**
+- `project_id` is for **memory/session context**, NOT routing decision logic
+- Routing = task-type classification (ANSWER vs ACTION)
+- Project context = metadata that travels with the routed task
+
+#### Validation Strategy (10-15 min)
+
+**Data Source:** Real session history from `~/.clawdbot/agents/*/sessions/*.jsonl`
+
+**Process:**
+1. Tag 5-10 historical sessions manually (ground truth)
+2. Apply routing rules retroactively
+3. Identify: What triggered new session vs continuation?
+4. Measure: correct routing / total tasks
+5. Success threshold: >85% accuracy
+
+**Pattern Validation Considerations:**
+- Test against real user patterns, not synthetic samples
+- Programmer tasks may have implicit context (last discussed file)
+- Monitor for false positives: conceptual questions misrouted to ACTION
+- Document edge cases for iteration
+
+**False Positive Monitoring:**
+- Log all routing decisions to `memory/YYYY-MM-DD.md` with format:
+  ```
+  HH:MM ROUTE "task snippet" → ACTION|ANSWER
+    Triggers: [list] | Pattern: <match>
+    Project: [name]
+  ```
+- Weekly review: Collect misclassifications, update patterns
+- Track metrics: ANSWER rate, ACTION rate, override frequency
 
 **Example Routing Decisions:**
 ```
 ✅ "What is HPOS?" → ANSWER (question, no external refs)
-✅ "Fix E2E tests in zbooks repo" → ACTION (keywords: fix, tests, repo)
-✅ "How do I find files?" → ANSWER (question precedence)
-✅ "Find all .ts files in src/" → ACTION (file extension + path)
+✅ "Fix E2E tests in zbooks repo" → ACTION (keywords: fix, tests, repo; project: zbooks)
+✅ "How do I find files with grep?" → ANSWER (question precedence)
+✅ "Find all .ts files in src/" → ACTION (file ext + path)
+✅ "Check the parser in json-lib" → ACTION (project switch from zbooks → ask to confirm)
 ```
 
 ### 0.1b Task Router — Hard Enforcement (30 min) — OPTIONAL
 
 **Purpose:** Code-based routing before LLM call (zero trust enforcement).
 
-**Location:** Clawdbot gateway/runtime (local patch)
+**Prerequisite:** Phase 0.1a validated with >85% accuracy on real sessions
+
+**Location:** Clawdbot gateway/runtime (local patch or fork)
 
 **Implementation:** TypeScript regex classifier in message handler
 
 **See:** `router.md` Phase 0.1b section for full TypeScript implementation
 
+#### Architecture-Specific Adjustments
+
+**Before implementing, map Clawdbot's message flow:**
+
+1. **Identify hook points:**
+   ```bash
+   cd ~/clawd
+   grep -r "handleMessage\|onMessage\|receiveMessage" node_modules/clawdbot/src/
+   ```
+
+2. **Determine injection point:**
+   - Telegram/WhatsApp channel handler?
+   - Session manager?
+   - Main agent loop?
+   - Where does prompt building happen?
+
+3. **Test compatibility:**
+   - Can we inject classifier before prompt building?
+   - Does it work with all channels (Telegram, WhatsApp, web)?
+   - Does it break existing message flows?
+   - Is there a clean rollback path?
+
+#### Implementation Approach
+
+**Option A: Feature-Flagged Local Patch (RECOMMENDED)**
+
+```typescript
+// In clawdbot/src/gateway/runtime.ts (or equivalent)
+const ENABLE_TASK_ROUTER = process.env.CLAWD_TASK_ROUTER === 'true';
+
+if (ENABLE_TASK_ROUTER) {
+  const mode = classifyTask(userMessage);
+  const agentPrompt = mode === 'ACTION' 
+    ? loadSwarmOrchestrator()
+    : loadDirectAnswerAgent();
+} else {
+  // Existing behavior (fallback)
+}
+```
+
+**Benefits:**
+- Safe testing without breaking existing setup
+- Easy rollback (`CLAWD_TASK_ROUTER=false`)
+- Validation before full commitment
+- No changes to upstream Clawdbot
+
+**Option B: Fork + Upstream PR**
+- Cleaner long-term
+- Benefits entire Clawdbot community
+- Takes longer to get merged
+- More maintenance overhead
+
+#### Validation & Monitoring
+
+**Phase 0.1b Testing Plan:**
+1. Map Clawdbot message flow (identify hook points)
+2. Implement feature-flagged classifier
+3. Test in isolated session (single user, controlled tasks)
+4. Monitor logs for routing decisions
+5. Compare soft vs hard routing accuracy
+6. Gradually roll out (`CLAWD_TASK_ROUTER=true`)
+7. Monitor for 1 week, collect feedback
+8. Document final adjustments
+
+**Success Metrics:**
+- Routing accuracy: >95% on production tasks
+- False positive rate: <3%
+- False negative rate: 0%
+- Performance: Routing adds <50ms latency
+- User satisfaction: No complaints about wrong mode selection
+
+#### Rollback Plan
+
+- Feature flag defaults to `false`
+- Falls back to soft routing (prompt-based)
+- All routing logs preserved for analysis
+- No data loss on rollback
+
 **Benefits:**
 - LLM never gets choice to ignore routing
 - Bulletproof enforcement
 - Can measure ANSWER vs ACTION ratio
+- Metrics collection for optimization
 
-**Rollback:** Feature flag `ENABLE_HARD_ROUTING=false` for fallback
-
-**Note:** Start with 0.1a (soft routing), validate patterns, then optionally implement 0.1b for hard enforcement.
+**Note:** Start with 0.1a (soft routing), validate patterns with >85% accuracy, then optionally implement 0.1b for hard enforcement. The deterministic routing approach, comprehensive edge case handling, and proper integration strategy ensure pattern validation and false positive monitoring are built into the architecture from the start.
 
 ### 0.2 Create Swarm Skill Directory
 ```bash
