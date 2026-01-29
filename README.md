@@ -1,6 +1,24 @@
 # ClawdBot Swarm
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/talas9/clawdbot-swarm)
+[![Status](https://img.shields.io/badge/status-implementation--ready-green.svg)](https://github.com/talas9/clawdbot-swarm/blob/main/swarm-memory-implementation-plan.md)
+
 A hierarchical agent swarm memory architecture for ClawdBot/Moltbot self-modification.
+
+## Project Metadata
+
+| Property | Value |
+|----------|-------|
+| **Name** | ClawdBot Swarm |
+| **Version** | 1.0 |
+| **Repository** | [github.com/talas9/clawdbot-swarm](https://github.com/talas9/clawdbot-swarm) |
+| **Owner** | Mohammed Talas ([@talas9](https://github.com/talas9)) |
+| **License** | [MIT License](LICENSE) |
+| **Target** | ClawdBot/Moltbot self-modification |
+| **Estimated Implementation** | 4-6 hours (autonomous execution) |
+| **Language** | TypeScript, Markdown |
+| **Category** | AI Agent Architecture, Memory Systems |
 
 ## Overview
 
@@ -74,12 +92,17 @@ clawdbot-swarm/
 
 ### Key Commands
 
+These are initialization commands for getting started. For full implementation details, follow the phases in the implementation plan.
+
 ```bash
-# Phase 0: Create skill directory
+# Phase 0: Create skill directory structure
 mkdir -p ~/clawd/skills/swarm-memory
+mkdir -p ~/clawd/memory/metrics
 
 # Initialize graph storage
 touch ~/clawd/memory/graph.jsonl
+
+# Continue with remaining phases in swarm-memory-implementation-plan.md
 ```
 
 ## CSP/1 Protocol Quick Reference
@@ -106,7 +129,7 @@ SNIPPET "brief text"
 | Short-Term | memory/YYYY-MM-DD.md | ~50-100/day | 7 days active | Memory Specialist |
 | Medium-Term | memory/graph.jsonl | Unlimited | Until decay | Memory Specialist |
 | Long-Term | MEMORY.md | <5000 tokens | Permanent | Memory Specialist |
-| Archive | sessions/*.jsonl | Unlimited | Permanent | Deep-dive only |
+| Archive | ~/.clawdbot/agents/*/sessions/*.jsonl | Unlimited | Permanent | Deep-dive only |
 
 ## Role Hierarchy
 
@@ -130,11 +153,55 @@ Specialist Specialist Specialist Specialist
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License**.
 
-## Author
+```
+MIT License
+
+Copyright (c) 2026 Mohammed Talas
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+See the full [LICENSE](LICENSE) file for complete details.
+
+### What this means:
+- ✅ Commercial use permitted
+- ✅ Modification permitted
+- ✅ Distribution permitted
+- ✅ Private use permitted
+- ⚠️ License and copyright notice required
+- ❌ No liability or warranty
+
+## Author & Maintainer
 
 **Mohammed Talas** ([@talas9](https://github.com/talas9))
+
+- 📧 Contact: Via GitHub
+- 🔗 Repository: [github.com/talas9/clawdbot-swarm](https://github.com/talas9/clawdbot-swarm)
+
+## Acknowledgments
+
+This project implements concepts from:
+- Hierarchical agent architectures
+- Memory-augmented language models
+- Token-efficient inter-agent communication protocols
 
 ---
 
