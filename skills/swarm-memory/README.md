@@ -84,17 +84,20 @@ await graphiti.add_episode(
 # Graphiti auto-extracts: auth.ts (File), JWT (Concept), bug (Event)
 # Relations: auth.ts IMPLEMENTS JWT, bug CAUSED_BY auth.ts
 
-# Search for entities
-results = await graphiti.search_entities(
+# Search for entities and facts
+results = await graphiti.search(
     query="authentication components",
-    num_results=10
+    num_results=10,
+    center_node_uuid=None
 )
 
-# Build context subgraph
-context = await graphiti.build_context(
-    entity_names=["auth.ts"],
-    max_facts=20
+# Build context subgraph (assemble manually from search results)
+context = await graphiti.search(
+    query="auth.ts",
+    num_results=20,
+    center_node_uuid="<entity_uuid>"  # Search from specific entity
 )
+# Then extract and assemble related entities from results
 ```
 
 See [memory-tiers/graph-schema.md](memory-tiers/graph-schema.md) for full schema and [memory-tiers/config.md](memory-tiers/config.md) for configuration.
