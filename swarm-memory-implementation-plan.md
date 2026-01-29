@@ -547,6 +547,120 @@ Add to your `~/.clawdbot/clawdbot.json`:
 
 ---
 
+## PHASE 2.5: DIALECTIC LAYER (45 min)
+
+### Purpose
+
+Two-agent debate system that prevents confirmation bias and breaks failure loops. Advocate defends plans, Critic challenges them, Orchestrator synthesizes.
+
+### 2.5.1 Create Advocate Sub-Agent (10 min)
+
+**File:** `skills/swarm-memory/subagents/advocate.md`
+
+- Defends proposed plans (Planning mode)
+- Proposes fixes after failures (Failure mode)
+- Must specify `DIFF_FROM_PREVIOUS` in failure mode
+- Optimistic bias, action-oriented
+- CSP/1 output format
+
+**Content:** See `advocate.md` in repo root for full specification
+
+### 2.5.2 Create Critic Sub-Agent (10 min)
+
+**File:** `skills/swarm-memory/subagents/critic.md`
+
+- Challenges plans with risks and objections
+- Identifies root cause patterns after failures
+- Must provide `COUNTER` or `ALTERNATIVES` (never just criticize)
+- Can trigger escalation via `SHOULD_ESCALATE` flag
+- Skeptical bias — "agreement is failure"
+- CSP/1 output format
+
+**Content:** See `critic.md` in repo root for full specification
+
+### 2.5.3 Create Debate Protocol Spec (10 min)
+
+**File:** `skills/swarm-memory/debate-protocol.md`
+
+- Planning debate flow (before high-stakes ops)
+- Failure debate flow (after 2 consecutive failures)
+- Synthesis rules for Orchestrator
+- Logging format for memory
+
+**Content:** See `debate-protocol.md` in repo root for full specification
+
+### 2.5.4 Add Failure Tracking (10 min)
+
+**File:** `memory/failures.jsonl`
+
+- Append-only log of task attempts
+- Fields: `task_id`, `attempt`, `timestamp`, `error`, `approach`
+- Query before execution to check failure count
+- Reset on success or 24h timeout
+
+**Format:**
+```json
+{"task_id":"fix-auth-test","attempt":1,"ts":"2026-01-29T14:30:00Z","error":"Cannot find module","approach":"updated import path"}
+{"task_id":"fix-auth-test","attempt":2,"ts":"2026-01-29T14:32:00Z","error":"Cannot find module","approach":"reinstalled deps"}
+```
+
+**Content:** See `failures.jsonl` in repo root for template
+
+### 2.5.5 Update Router with Debate Triggers (5 min)
+
+**Update:** `skills/swarm-memory/router.md`
+
+Add after "## Confidence Levels":
+- Planning debate triggers (destructive, deployment, security, bulk)
+- Failure debate triggers (2 fails, same error pattern, user rejection)
+- Auto-escalate rules (3+ fails, security + any fail)
+- Bypass rules (read-only, trivial, user override)
+
+**Content:** See `router.md` in repo root — debate triggers section already added
+
+### 2.5.6 Update CSP/1 with Debate Extensions (5 min)
+
+**Update:** `skills/swarm-memory/CSP1.md`
+
+Add after "## Task Request Format":
+- Debate request formats (`DEBATE`, `DEBATE_FAILURE`)
+- Advocate response format (`POSITION ADVOCATE`)
+- Critic response format (`POSITION CRITIC`)
+- Synthesis response format (`RESOLUTION`)
+
+**Content:** See `CSP1-debate-extensions.md` in repo root for complete additions
+
+### Verification Checklist
+
+- [ ] Advocate responds in CSP/1 format
+- [ ] Critic always includes at least 1 RISK or BLIND_SPOT
+- [ ] Failure debate triggers after exactly 2 failures
+- [ ] Auto-escalate triggers after 3 failures
+- [ ] Debate logs appear in `memory/YYYY-MM-DD.md`
+- [ ] Synthesis produces valid `PROCEED|MODIFY|ESCALATE`
+
+### Test Scenarios
+
+**Planning Debate Test:**
+```
+Task: "Delete all .bak files in the project"
+Expected: DEBATE_PLANNING triggers (destructive + bulk)
+```
+
+**Failure Debate Test:**
+```
+Task: "Fix import error" → Fail → Retry → Fail
+Expected: DEBATE_FAILURE triggers, Advocate proposes DIFF, Critic evaluates
+```
+
+**Auto-Escalate Test:**
+```
+Task: Fail 3 times
+Expected: Skip debate, immediate escalate to human
+```
+
+---
+
 ## PHASE 3: ORCHESTRATOR MODIFICATIONS (45 min)
 
 ### 3.1 Update AGENTS.md
@@ -1152,10 +1266,11 @@ SNIPPET "brief text"
 | 0: Foundation | 15 min | 15 min |
 | 1: Specialists | 45 min | 1 hr |
 | 2: Memory Tiers | 60 min | 2 hr |
-| 3: Orchestrator | 45 min | 2 hr 45 min |
-| 4: Parser | 30 min | 3 hr 15 min |
-| 5: Maintenance | 30 min | 3 hr 45 min |
-| 6: Testing | 45 min | 4 hr 30 min |
+| **2.5: Dialectic Layer** | **45 min** | **2 hr 45 min** |
+| 3: Orchestrator | 45 min | 3 hr 30 min |
+| 4: Parser | 30 min | 4 hr |
+| 5: Maintenance | 30 min | 4 hr 30 min |
+| 6: Testing | 45 min | 5 hr 15 min |
 | 7: Bootstrapping | Ongoing | — |
 
 ---

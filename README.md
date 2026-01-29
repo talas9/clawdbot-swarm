@@ -51,6 +51,7 @@ clawdbot-swarm/
     ├── SKILL.md                        # Entry point
     ├── router.md                       # Task classification rules
     ├── CSP1.md                         # Protocol specification
+    ├── debate-protocol.md              # Debate system specification
     ├── specialists/                    # Specialist agents
     │   ├── memory.md                   # Memory operations
     │   ├── file.md                     # Filesystem operations
@@ -61,7 +62,9 @@ clawdbot-swarm/
     │   └── graph-schema.md             # Graph schema
     ├── subagents/                      # Sub-agent templates
     │   ├── analyzer.md                 # Task decomposition
-    │   └── planner.md                  # Execution planning
+    │   ├── planner.md                  # Execution planning
+    │   ├── advocate.md                 # Debate advocate (defends)
+    │   └── critic.md                   # Debate critic (challenges)
     ├── parser/                         # CSP/1 utilities
     │   ├── csp1-parser.ts              # Protocol parser
     │   └── response-formatter.ts       # Response formatting
@@ -79,13 +82,16 @@ clawdbot-swarm/
 | **0.2-0.4** | Foundation - Swarm skill directory and CSP/1 protocol | 15 min |
 | **1** | Specialist Agents - Memory, File, Web, Tool specialists | 45 min |
 | **2** | Memory Tiers - Ultra-short, short, medium, long-term memory | 60 min |
+| **2.5** | **Dialectic Layer - Advocate/Critic debate system** | **45 min** |
 | **3** | Orchestrator Modifications - Role hierarchy and delegation | 45 min |
 | **4** | CSP/1 Parser - Protocol parsing utilities | 30 min |
 | **5** | Memory Maintenance - Cron jobs for decay and optimization | 30 min |
 | **6** | Integration & Testing - End-to-end validation | 45 min |
 | **7** | Bootstrapping - Self-application of capabilities | Ongoing |
 
-**Total Estimated Time:** 5-7 hours (autonomous execution)
+**Total Estimated Time:** 5.75-7.75 hours (autonomous execution)
+
+**New in this version:** Phase 2.5 adds a two-agent debate system that prevents confirmation bias before high-stakes operations and breaks failure loops after repeated errors.
 
 ## Quick Start
 
@@ -133,6 +139,40 @@ SNIPPET "brief text"
 | Medium-Term | memory/graph.jsonl | Unlimited | Until decay | Memory Specialist |
 | Long-Term | MEMORY.md | <5000 tokens | Permanent | Memory Specialist |
 | Archive | ~/.clawdbot/agents/*/sessions/*.jsonl | Unlimited | Permanent | Deep-dive only |
+
+## Dialectic Layer (Debate System)
+
+Two-agent debate prevents confirmation bias and breaks failure loops:
+
+| Agent | Role | Bias |
+|-------|------|------|
+| **Advocate** | Defend plans, propose fixes | Optimistic, action-oriented |
+| **Critic** | Challenge with risks, find root causes | Skeptical, cautious |
+
+### When Debates Trigger
+
+| Trigger | Type | Action |
+|---------|------|--------|
+| Destructive ops (delete, drop) | Planning | Debate before execution |
+| Deployment (deploy, release) | Planning | Debate before execution |
+| 2 consecutive failures | Failure | Debate before retry |
+| 3+ consecutive failures | — | Auto-escalate to human |
+
+### Debate Flow
+
+```
+Advocate: "Here's why this will work..."
+    ↓
+Critic: "Here's what could go wrong..."
+    ↓
+Orchestrator: PROCEED | MODIFY | ESCALATE
+```
+
+**Key Features:**
+- Advocate must specify `DIFF_FROM_PREVIOUS` (no blind retries)
+- Critic must always find at least 1 risk ("agreement is failure")
+- `SHOULD_ESCALATE` flag for critic-triggered escalation
+- Auto-escalate after 3 failures (debate already tried)
 
 ## Role Hierarchy
 
