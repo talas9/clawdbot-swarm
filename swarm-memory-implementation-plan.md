@@ -1,9 +1,9 @@
 # Agent Swarm Memory Architecture — Clawdbot Implementation Plan
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Target:** Clawdbot/Moltbot self-modification  
 **Owner:** Mohammed Talas (@talas9)  
-**Estimated Time:** 4-6 hours (autonomous execution)
+**Estimated Time:** 5-7 hours (autonomous execution)
 
 ---
 
@@ -19,14 +19,59 @@ After each phase, **use the capabilities you just built** to assist with subsequ
 
 ---
 
-## PHASE 0: FOUNDATION (15 min)
+## PHASE 0: FOUNDATION (60 min)
 
-### 0.1 Create Swarm Skill Directory
+### 0.1a Task Router — Soft Enforcement (15 min)
+
+**Purpose:** Prevent "lazy orchestrator" syndrome with deterministic task classification.
+
+**Create:** `~/clawd/skills/swarm-memory/router.md` (see `router.md` in repo root for full spec)
+
+**Key Points:**
+- **ANSWER precedence:** Question patterns + no external refs → direct response
+- **ACTION triggers:** File paths, keywords (fix, search, run), URLs → swarm mode
+- **Default:** When in doubt → ACTION mode
+- **Logging:** All routing decisions logged to `memory/YYYY-MM-DD.md`
+
+**Validation:**
+1. Test against 20+ sample tasks
+2. Verify >90% correct routing
+3. Document edge cases
+4. Iterate on patterns
+
+**Example Routing Decisions:**
+```
+✅ "What is HPOS?" → ANSWER (question, no external refs)
+✅ "Fix E2E tests in zbooks repo" → ACTION (keywords: fix, tests, repo)
+✅ "How do I find files?" → ANSWER (question precedence)
+✅ "Find all .ts files in src/" → ACTION (file extension + path)
+```
+
+### 0.1b Task Router — Hard Enforcement (30 min) — OPTIONAL
+
+**Purpose:** Code-based routing before LLM call (zero trust enforcement).
+
+**Location:** Clawdbot gateway/runtime (local patch)
+
+**Implementation:** TypeScript regex classifier in message handler
+
+**See:** `router.md` Phase 0.1b section for full TypeScript implementation
+
+**Benefits:**
+- LLM never gets choice to ignore routing
+- Bulletproof enforcement
+- Can measure ANSWER vs ACTION ratio
+
+**Rollback:** Feature flag `ENABLE_HARD_ROUTING=false` for fallback
+
+**Note:** Start with 0.1a (soft routing), validate patterns, then optionally implement 0.1b for hard enforcement.
+
+### 0.2 Create Swarm Skill Directory
 ```bash
 mkdir -p ~/clawd/skills/swarm-memory
 ```
 
-### 0.2 Create CSP/1 Protocol Specification
+### 0.3 Create CSP/1 Protocol Specification
 Create `~/clawd/skills/swarm-memory/CSP1.md`:
 
 ```markdown
@@ -89,7 +134,7 @@ DATA none
 READ_RECS none
 ```
 
-### 0.3 Create SKILL.md Entry Point
+### 0.4 Create SKILL.md Entry Point
 Create `~/clawd/skills/swarm-memory/SKILL.md`:
 
 ```markdown
