@@ -19,11 +19,12 @@ This repository implements **Clawdbot Swarm**, a hierarchical agent swarm archit
 - See `swarm-memory-implementation-plan.md` for full specification
 
 ### Memory Tiers
-The system implements a four-tier memory architecture:
-1. **Ultra-short**: Immediate context
-2. **Short**: Recent operations
-3. **Medium**: Session-level knowledge
-4. **Long**: Persistent knowledge base
+The system implements a five-tier memory architecture:
+1. **Ultra-short (Active Context)**: Immediate context in LLM prompt (4-8k tokens)
+2. **Short-term (Session Summaries)**: Recent operations, 7-day retention
+3. **Medium-term (Relation Graph)**: Entity relations with weights
+4. **Long-term (Curated Knowledge)**: Permanent durable facts and decisions
+5. **Archive (Raw Logs)**: Complete conversation transcripts for deep-dive analysis
 
 ## Tech Stack
 
