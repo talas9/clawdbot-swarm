@@ -34,7 +34,18 @@ This project transforms ClawdBot into a hierarchical agent swarm with:
 clawdbot-swarm/
 ├── README.md                           # This file
 ├── LICENSE                             # MIT License
-└── swarm-memory-implementation-plan.md # Detailed implementation guide
+├── swarm-memory-implementation-plan.md # Detailed implementation guide
+└── swarm-cli/                          # CLI utilities for implementation
+    ├── README.md                       # CLI documentation
+    ├── package.json
+    └── src/
+        ├── index.ts                    # CLI entry point
+        └── commands/                   # Command implementations
+            ├── task-id.ts              # Task ID generation (SHA-256)
+            ├── uuid.ts                 # UUID generation
+            ├── scaffold.ts             # File scaffolding
+            ├── memory.ts               # Memory initialization
+            └── validate.ts             # Implementation validation
 ```
 
 ### Target Directory Structure (After Implementation)
@@ -51,6 +62,7 @@ clawdbot-swarm/
     ├── SKILL.md                        # Entry point
     ├── router.md                       # Task classification rules
     ├── CSP1.md                         # Protocol specification
+    ├── debate-protocol.md              # Debate system specification
     ├── specialists/                    # Specialist agents
     │   ├── memory.md                   # Memory operations
     │   ├── file.md                     # Filesystem operations
@@ -61,7 +73,9 @@ clawdbot-swarm/
     │   └── graph-schema.md             # Graph schema
     ├── subagents/                      # Sub-agent templates
     │   ├── analyzer.md                 # Task decomposition
-    │   └── planner.md                  # Execution planning
+    │   ├── planner.md                  # Execution planning
+    │   ├── advocate.md                 # Debate advocate (defends)
+    │   └── critic.md                   # Debate critic (challenges)
     ├── parser/                         # CSP/1 utilities
     │   ├── csp1-parser.ts              # Protocol parser
     │   └── response-formatter.ts       # Response formatting
@@ -77,21 +91,57 @@ clawdbot-swarm/
 | **0.1a** | Task Router (Soft) - Pattern-based task classification | 15 min |
 | **0.1b** | Task Router (Hard) - Code-based enforcement (optional) | 30 min |
 | **0.2-0.4** | Foundation - Swarm skill directory and CSP/1 protocol | 15 min |
+| **0.5** | **Implementation Utilities - CLI tool for automation** | **30 min** |
 | **1** | Specialist Agents - Memory, File, Web, Tool specialists | 45 min |
 | **2** | Memory Tiers - Ultra-short, short, medium, long-term memory | 60 min |
+| **2.5** | **Dialectic Layer - Advocate/Critic debate system** | **45 min** |
 | **3** | Orchestrator Modifications - Role hierarchy and delegation | 45 min |
 | **4** | CSP/1 Parser - Protocol parsing utilities | 30 min |
 | **5** | Memory Maintenance - Cron jobs for decay and optimization | 30 min |
 | **6** | Integration & Testing - End-to-end validation | 45 min |
 | **7** | Bootstrapping - Self-application of capabilities | Ongoing |
 
-**Total Estimated Time:** 5-7 hours (autonomous execution)
+**Total Estimated Time:** 5.83-7.83 hours (autonomous execution)
+
+**New in this version:** 
+- Phase 0.5 adds CLI utilities that AI creates and uses for mechanical tasks (UUID generation, task ID hashing, scaffolding), reducing token costs ~10-15%
+- Phase 2.5 adds a two-agent debate system that prevents confirmation bias before high-stakes operations and breaks failure loops after repeated errors.
 
 ## Quick Start
 
 1. **Read the implementation plan** in [`swarm-memory-implementation-plan.md`](swarm-memory-implementation-plan.md)
-2. **Execute phases sequentially** - Each phase builds on the previous
-3. **Use capabilities as built** - Apply completed phases to accelerate subsequent work
+2. **Set up the CLI tool** (see below) for automating mechanical tasks
+3. **Execute phases sequentially** - Each phase builds on the previous
+4. **Use capabilities as built** - Apply completed phases to accelerate subsequent work
+
+### Swarm CLI Tool
+
+A CLI utility to automate mechanical tasks and reduce AI token usage during implementation:
+
+```bash
+# Install
+cd swarm-cli && npm install && npm run build
+
+# Generate task IDs (using SHA-256 strategy from debate-protocol.md)
+npm run swarm task-id "Fix authentication test"
+
+# Generate UUIDs
+npm run swarm uuid --count 5
+
+# Scaffold files from templates
+npm run swarm scaffold agent "Validator"
+npm run swarm scaffold skill "Git History"
+
+# Initialize memory structure
+npm run swarm init-memory
+
+# Validate implementation completeness
+npm run swarm validate --phase 2.5
+```
+
+See [`swarm-cli/README.md`](swarm-cli/README.md) for full documentation.
+
+**Why use the CLI?** Automates static generation (UUIDs, hashes, boilerplate), saving tokens and time. AI focuses on complex decisions, not mechanical tasks.
 
 ### Key Commands
 
@@ -104,6 +154,9 @@ mkdir -p ~/clawd/memory/metrics
 
 # Initialize graph storage
 touch ~/clawd/memory/graph.jsonl
+
+# Or use CLI tool:
+cd swarm-cli && npm run swarm init-memory --path ~/clawd
 
 # Continue with remaining phases in swarm-memory-implementation-plan.md
 ```
@@ -133,6 +186,40 @@ SNIPPET "brief text"
 | Medium-Term | memory/graph.jsonl | Unlimited | Until decay | Memory Specialist |
 | Long-Term | MEMORY.md | <5000 tokens | Permanent | Memory Specialist |
 | Archive | ~/.clawdbot/agents/*/sessions/*.jsonl | Unlimited | Permanent | Deep-dive only |
+
+## Dialectic Layer (Debate System)
+
+Two-agent debate prevents confirmation bias and breaks failure loops:
+
+| Agent | Role | Bias |
+|-------|------|------|
+| **Advocate** | Defend plans, propose fixes | Optimistic, action-oriented |
+| **Critic** | Challenge with risks, find root causes | Skeptical, cautious |
+
+### When Debates Trigger
+
+| Trigger | Type | Action |
+|---------|------|--------|
+| Destructive ops (delete, drop) | Planning | Debate before execution |
+| Deployment (deploy, release) | Planning | Debate before execution |
+| 2 consecutive failures | Failure | Debate before retry |
+| 3+ consecutive failures | — | Auto-escalate to human |
+
+### Debate Flow
+
+```
+Advocate: "Here's why this will work..."
+    ↓
+Critic: "Here's what could go wrong..."
+    ↓
+Orchestrator: PROCEED | MODIFY | ESCALATE
+```
+
+**Key Features:**
+- Advocate must specify `DIFF_FROM_PREVIOUS` (no blind retries)
+- Critic must always find at least 1 risk ("agreement is failure")
+- `SHOULD_ESCALATE` flag for critic-triggered escalation
+- Auto-escalate after 3 failures (debate already tried)
 
 ## Role Hierarchy
 

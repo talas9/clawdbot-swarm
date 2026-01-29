@@ -161,6 +161,184 @@ All inter-agent communication uses CSP/1. See CSP1.md.
 
 ---
 
+## PHASE 0.5: IMPLEMENTATION UTILITIES (30 min)
+
+### Purpose
+
+Create CLI tooling to automate mechanical tasks, reducing token costs during implementation. AI creates the tool, then uses it in subsequent phases for deterministic operations.
+
+**Long-term vision:** This CLI becomes the **permanent home for all scripts and tools** that don't require AI reasoning. As the swarm evolves, new automation commands will be added here for batch operations, data transformations, metrics analysis, and system maintenance—anything that's deterministic and doesn't need creative thinking.
+
+### 0.5.1 Create CLI Project Structure (5 min)
+
+**Directory:** `swarm-cli/`
+
+```bash
+mkdir -p swarm-cli/src/commands
+cd swarm-cli
+```
+
+**Files to create:**
+- `package.json` - Project configuration with Commander.js, Chalk, TypeScript
+- `tsconfig.json` - TypeScript configuration
+- `src/index.ts` - CLI entry point
+- `.gitignore` - Exclude node_modules, dist, logs
+
+### 0.5.2 Task ID Command (5 min)
+
+**Create:** `src/commands/task-id.ts`
+
+**Implements:** SHA-256 hash strategy from `debate-protocol.md`
+
+**Canonicalization rules:**
+1. Lowercase all text
+2. Remove punctuation except hyphens/underscores
+3. Normalize whitespace to single spaces
+4. Stem common verbs (fix/fixing/fixed → fix)
+
+**Usage:**
+```bash
+npm run swarm task-id "Fix authentication test"
+# Output: a3f2c1d4e5f6a7b8 (first 16 chars of SHA-256)
+```
+
+**Tests:** Create `src/test/task-id.test.ts` with canonicalization and hashing tests
+
+### 0.5.3 UUID Command (5 min)
+
+**Create:** `src/commands/uuid.ts`
+
+**Features:**
+- Random UUID v4 generation
+- Deterministic UUID from seed (for reproducible tests)
+- Multiple UUID generation (--count flag)
+
+**Usage:**
+```bash
+npm run swarm uuid                           # Single random UUID
+npm run swarm uuid --count 5                 # Five UUIDs
+npm run swarm uuid --deterministic "seed"    # Deterministic UUID
+```
+
+**Tests:** Create `src/test/uuid.test.ts` with format and determinism tests
+
+### 0.5.4 Scaffold Command (5 min)
+
+**Create:** `src/commands/scaffold.ts`
+
+**Templates:**
+- `agent` - Agent specification with CSP/1 format
+- `skill` - Skill documentation template
+- `behavior` - Memory behavior specification
+- `memory` - Memory entry template
+
+**Usage:**
+```bash
+npm run swarm scaffold agent "Validator"
+npm run swarm scaffold skill "Git History"
+```
+
+**Reduces:** Boilerplate creation from 5-10 minutes (AI) to instant
+
+### 0.5.5 Memory Init Command (5 min)
+
+**Create:** `src/commands/memory.ts`
+
+**Creates:**
+- `MEMORY.md` (long-term memory)
+- `memory/active-tasks.md` (task tracking)
+- `memory/episodic.jsonl` (episodic log)
+- `memory/importance-tiers.jsonl` (importance scoring)
+- `memory/failures.jsonl` (failure tracking from Phase 2.5)
+- `memory/debate-metrics.jsonl` (debate performance from Phase 2.5)
+
+**Usage:**
+```bash
+npm run swarm init-memory --path ~/clawd
+```
+
+**Replaces:** Manual directory creation + file scaffolding
+
+### 0.5.6 Validate Command (5 min)
+
+**Create:** `src/commands/validate.ts`
+
+**Validates:**
+- Required files exist for each phase
+- Correct file types (file vs directory)
+- Phase-by-phase completeness checking
+
+**Usage:**
+```bash
+npm run swarm validate                 # All phases
+npm run swarm validate --phase 2.5     # Specific phase
+npm run swarm validate --verbose       # Show all checks
+```
+
+**Phase validation rules:**
+```typescript
+const phases: Record<string, ValidationRule[]> = {
+  '0': [
+    { name: 'Task Router', path: 'skills/swarm-memory/router.md', type: 'file', required: true },
+    { name: 'CSP/1 Protocol', path: 'CSP1.md', type: 'file', required: true },
+  ],
+  '2.5': [
+    { name: 'Advocate Agent', path: 'advocate.md', type: 'file', required: true },
+    { name: 'Critic Agent', path: 'critic.md', type: 'file', required: true },
+    { name: 'Debate Protocol', path: 'debate-protocol.md', type: 'file', required: true },
+    { name: 'Failure Tracking', path: 'failures.jsonl', type: 'file', required: true },
+  ],
+  // ... other phases
+};
+```
+
+### Benefits
+
+**Token savings:** ~10-15% reduction in total implementation cost
+
+**Time savings:**
+- UUID generation: AI (3-5 min) → CLI (instant)
+- Task ID hashing: AI (2-3 min) → CLI (instant)
+- Boilerplate scaffolding: AI (5-10 min) → CLI (instant)
+- Memory structure init: AI (10-15 min) → CLI (instant)
+
+**Reliability:** Deterministic outputs (task IDs always hash identically)
+
+**Reusability:** Tool serves all phases, can be extended as implementation progresses
+
+### Verification Checklist
+
+After completion:
+- [ ] All 5 commands implemented (task-id, uuid, scaffold, init-memory, validate)
+- [ ] Tests pass for task-id (canonicalization, hashing)
+- [ ] Tests pass for uuid (format, version bits, determinism)
+- [ ] README.md documents all commands with examples
+- [ ] `npm run build` succeeds
+- [ ] `npm test` succeeds
+
+### Usage in Subsequent Phases
+
+**Phase 2 (Memory):**
+```bash
+npm run swarm init-memory --path ~/clawd
+npm run swarm uuid --count 10  # Generate memory entry IDs
+```
+
+**Phase 2.5 (Dialectic):**
+```bash
+npm run swarm task-id "fix auth test"  # Generate task ID for failure tracking
+npm run swarm scaffold agent "Advocate"
+npm run swarm scaffold agent "Critic"
+```
+
+**Phase 3-6:**
+```bash
+npm run swarm validate --phase 3       # Check Phase 3 completion
+npm run swarm scaffold skill "XYZ"     # Scaffold new components
+```
+
+---
+
 ## PHASE 1: SPECIALIST AGENTS (45 min)
 
 ### 1.1 Create Specialists Directory
@@ -543,6 +721,120 @@ Add to your `~/.clawdbot/clawdbot.json`:
     }
   }
 }
+```
+
+---
+
+## PHASE 2.5: DIALECTIC LAYER (50 min)
+
+### Purpose
+
+Two-agent debate system that prevents confirmation bias and breaks failure loops. Advocate defends plans, Critic challenges them, Orchestrator synthesizes.
+
+### 2.5.1 Create Advocate Sub-Agent (10 min)
+
+**File:** `skills/swarm-memory/subagents/advocate.md`
+
+- Defends proposed plans (Planning mode)
+- Proposes fixes after failures (Failure mode)
+- Must specify `DIFF_FROM_PREVIOUS` in failure mode
+- Optimistic bias, action-oriented
+- CSP/1 output format
+
+**Content:** See `advocate.md` in repo root for full specification
+
+### 2.5.2 Create Critic Sub-Agent (10 min)
+
+**File:** `skills/swarm-memory/subagents/critic.md`
+
+- Challenges plans with risks and objections
+- Identifies root cause patterns after failures
+- Must provide `COUNTER` or `ALTERNATIVES` (never just criticize)
+- Can trigger escalation via `SHOULD_ESCALATE` flag
+- Skeptical bias — "agreement is failure"
+- CSP/1 output format
+
+**Content:** See `critic.md` in repo root for full specification
+
+### 2.5.3 Create Debate Protocol Spec (10 min)
+
+**File:** `skills/swarm-memory/debate-protocol.md`
+
+- Planning debate flow (before high-stakes ops)
+- Failure debate flow (after 2 consecutive failures)
+- Synthesis rules for Orchestrator
+- Logging format for memory
+
+**Content:** See `debate-protocol.md` in repo root for full specification
+
+### 2.5.4 Add Failure Tracking (10 min)
+
+**File:** `memory/failures.jsonl`
+
+- Append-only log of task attempts
+- Fields: `task_id`, `attempt`, `timestamp`, `error`, `approach`
+- Query before execution to check failure count
+- Reset on success or 24h timeout
+
+**Format:**
+```json
+{"task_id":"fix-auth-test","attempt":1,"ts":"2026-01-29T14:30:00Z","error":"Cannot find module","approach":"updated import path"}
+{"task_id":"fix-auth-test","attempt":2,"ts":"2026-01-29T14:32:00Z","error":"Cannot find module","approach":"reinstalled deps"}
+```
+
+**Content:** See `failures.jsonl` in repo root for template
+
+### 2.5.5 Update Router with Debate Triggers (5 min)
+
+**Update:** `skills/swarm-memory/router.md`
+
+Add after "## Confidence Levels":
+- Planning debate triggers (destructive, deployment, security, bulk)
+- Failure debate triggers (2 fails, same error pattern, user rejection)
+- Auto-escalate rules (3+ fails, security + any fail)
+- Bypass rules (read-only, trivial, user override)
+
+**Content:** See `router.md` in repo root — debate triggers section already added
+
+### 2.5.6 Update CSP/1 with Debate Extensions (5 min)
+
+**Update:** `skills/swarm-memory/CSP1.md`
+
+Add after "## Task Request Format":
+- Debate request formats (`DEBATE`, `DEBATE_FAILURE`)
+- Advocate response format (`POSITION ADVOCATE`)
+- Critic response format (`POSITION CRITIC`)
+- Synthesis response format (`RESOLUTION`)
+
+**Content:** See `CSP1-debate-extensions.md` in repo root for complete additions
+
+### Verification Checklist
+
+- [ ] Advocate responds in CSP/1 format
+- [ ] Critic always includes at least 1 RISK or BLIND_SPOT
+- [ ] Failure debate triggers after exactly 2 failures
+- [ ] Auto-escalate triggers after 3 failures
+- [ ] Debate logs appear in `memory/YYYY-MM-DD.md`
+- [ ] Synthesis produces valid `PROCEED|MODIFY|RETRY|PIVOT|ESCALATE`
+
+### Test Scenarios
+
+**Planning Debate Test:**
+```
+Task: "Delete all .bak files in the project"
+Expected: DEBATE_PLANNING triggers (destructive + bulk)
+```
+
+**Failure Debate Test:**
+```
+Task: "Fix import error" → Fail → Retry → Fail
+Expected: DEBATE_FAILURE triggers, Advocate proposes DIFF, Critic evaluates
+```
+
+**Auto-Escalate Test:**
+```
+Task: Fail 3 times
+Expected: Skip debate, immediate escalate to human
 ```
 
 ---
@@ -1150,12 +1442,14 @@ SNIPPET "brief text"
 | Phase | Duration | Cumulative |
 |-------|----------|------------|
 | 0: Foundation | 15 min | 15 min |
-| 1: Specialists | 45 min | 1 hr |
-| 2: Memory Tiers | 60 min | 2 hr |
-| 3: Orchestrator | 45 min | 2 hr 45 min |
-| 4: Parser | 30 min | 3 hr 15 min |
-| 5: Maintenance | 30 min | 3 hr 45 min |
-| 6: Testing | 45 min | 4 hr 30 min |
+| **0.5: Implementation Utilities** | **30 min** | **45 min** |
+| 1: Specialists | 45 min | 1 hr 30 min |
+| 2: Memory Tiers | 60 min | 2 hr 30 min |
+| **2.5: Dialectic Layer** | **50 min** | **3 hr 20 min** |
+| 3: Orchestrator | 45 min | 4 hr 5 min |
+| 4: Parser | 30 min | 4 hr 35 min |
+| 5: Maintenance | 30 min | 5 hr 5 min |
+| 6: Testing | 45 min | 5 hr 50 min |
 | 7: Bootstrapping | Ongoing | — |
 
 ---

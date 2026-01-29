@@ -103,6 +103,82 @@ If no ANSWER precedence and no ACTION triggers → ANSWER mode
 - **Behavior:** Direct response permitted
 - **Example:** "What is the difference between HPOS and classic?"
 
+## Debate Triggers
+
+Debate is a conditional layer — not every task needs it. These triggers determine when to invoke the Advocate/Critic dialectic.
+
+### Planning Debate Triggers (before execution)
+
+| Trigger | Condition | Stakes Level |
+|---------|-----------|--------------|
+| Destructive operations | delete, drop, remove, truncate, overwrite | high |
+| Deployment | deploy, publish, release, push to prod/main | high |
+| Security-sensitive | auth, token, password, secret, key, credential | high |
+| Bulk operations | "all", "every", "entire", wildcard patterns (*) | medium |
+| Ambiguous scope | WEAK ACTION confidence + vague terms | medium |
+
+### Failure Debate Triggers (after execution)
+
+| Trigger | Condition | Action |
+|---------|-----------|--------|
+| 2 consecutive failures | Same task failed twice | DEBATE_FAILURE |
+| Same error pattern | Different tasks, identical error | DEBATE_FAILURE |
+| User rejection 2x | Output rejected/revised twice | DEBATE_FAILURE |
+| 3+ consecutive failures | Debate already happened | AUTO_ESCALATE |
+| Security + any failure | High-stakes task failed once | AUTO_ESCALATE |
+
+### Debate Bypass (never debate)
+
+- Read-only operations (search, list, cat, grep, find)
+- Trivial commands (pwd, date, whoami, echo)
+- User said "just do it", "skip confirmation", "I'm sure"
+- Task already debated this session (don't re-debate same decision)
+
+### Routing Logic (Updated)
+
+```
+INCOMING TASK
+    │
+    ▼
+┌─────────────────┐
+│ TRIGGER DETECT  │
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    ▼         ▼
+ ANSWER     ACTION
+    │         │
+    │    ┌────┴────┐
+    │    ▼         ▼
+    │  PLANNING  NO DEBATE
+    │  TRIGGER?  (proceed)
+    │    │         │
+    │    ▼ yes     │
+    │  DEBATE_     │
+    │  PLANNING    │
+    │    │         │
+    │    ▼         │
+    │  EXECUTE     │
+    │    │         │
+    │    ▼         │
+    │  FAILURE?──no──→ DONE
+    │    │
+    │    yes
+    │    ▼
+    │  FAIL_COUNT >= 2?
+    │    │
+    │    yes
+    │    ▼
+    │  DEBATE_
+    │  FAILURE
+    │    │
+    │    ▼
+    │  RETRY|PIVOT|ESCALATE
+    │    │
+    ▼    ▼
+RESPOND
+```
+
 ## Trivial Bypass
 
 **Commands that match ACTION keywords but don't need full swarm:**

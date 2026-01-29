@@ -1,0 +1,2 @@
+# Failure tracking - append only
+# Format: {"task_id":"<hash>","attempt":<n>,"ts":"<iso>","error":"<msg>","approach":"<description>"}
