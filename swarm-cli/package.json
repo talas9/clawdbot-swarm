@@ -9,7 +9,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "swarm": "node --loader ts-node/esm src/index.ts"
+    "swarm": "node --loader ts-node/esm src/index.ts",
+    "test": "node --test dist/test/**/*.test.js",
+    "test:watch": "node --test --watch dist/test/**/*.test.js"
   },
   "dependencies": {
     "commander": "^12.1.0",

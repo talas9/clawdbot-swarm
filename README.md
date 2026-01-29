@@ -91,6 +91,7 @@ clawdbot-swarm/
 | **0.1a** | Task Router (Soft) - Pattern-based task classification | 15 min |
 | **0.1b** | Task Router (Hard) - Code-based enforcement (optional) | 30 min |
 | **0.2-0.4** | Foundation - Swarm skill directory and CSP/1 protocol | 15 min |
+| **0.5** | **Implementation Utilities - CLI tool for automation** | **30 min** |
 | **1** | Specialist Agents - Memory, File, Web, Tool specialists | 45 min |
 | **2** | Memory Tiers - Ultra-short, short, medium, long-term memory | 60 min |
 | **2.5** | **Dialectic Layer - Advocate/Critic debate system** | **45 min** |
@@ -100,9 +101,11 @@ clawdbot-swarm/
 | **6** | Integration & Testing - End-to-end validation | 45 min |
 | **7** | Bootstrapping - Self-application of capabilities | Ongoing |
 
-**Total Estimated Time:** 5.33-7.33 hours (autonomous execution)
+**Total Estimated Time:** 5.83-7.83 hours (autonomous execution)
 
-**New in this version:** Phase 2.5 adds a two-agent debate system that prevents confirmation bias before high-stakes operations and breaks failure loops after repeated errors.
+**New in this version:** 
+- Phase 0.5 adds CLI utilities that AI creates and uses for mechanical tasks (UUID generation, task ID hashing, scaffolding), reducing token costs ~10-15%
+- Phase 2.5 adds a two-agent debate system that prevents confirmation bias before high-stakes operations and breaks failure loops after repeated errors.
 
 ## Quick Start
 
