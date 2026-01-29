@@ -181,8 +181,10 @@ Orchestrator → Memory Specialist (CSP/1):
     ↓
 Memory Specialist → Graphiti:
     episode = graphiti.add_episode(
+        name=f"jwt_race_condition_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
         episode_body="JWT refresh tokens have a race condition",
         source_description="User conversation",
+        source=EpisodeType.message,
         reference_time=datetime.now()
     )
     ↓
@@ -332,7 +334,10 @@ snapshot = graphiti.get_temporal_snapshot(
    for entry in jsonl:
        episode_body = f"{entry['e1']} is related to {entry['e2']} through {entry['ctx']}"
        graphiti.add_episode(
+           name=f"migration_{entry['ts']}_{uuid4().hex[:8]}",
            episode_body=episode_body,
+           source_description="JSONL migration import",
+           source=EpisodeType.text,
            reference_time=datetime.fromtimestamp(entry['ts'])
        )
    ```
