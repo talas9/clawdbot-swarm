@@ -38,7 +38,7 @@ The system implements a four-tier memory architecture:
 /
 ├── .github/                    # GitHub configuration files
 │   └── copilot-instructions.md # This file
-├── README.md                   # Project readme
+├── README.md                   # Project README
 ├── LICENSE                     # License file
 └── swarm-memory-implementation-plan.md  # Detailed implementation plan
 ```
