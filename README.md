@@ -1,7 +1,7 @@
 # ClawdBot Swarm
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Version](https://img.shields.io/badge/version-1.0-blue.svg)](https://github.com/talas9/clawdbot-swarm)
+[![Version](https://img.shields.io/badge/version-1.1-blue.svg)](https://github.com/talas9/clawdbot-swarm)
 [![Status](https://img.shields.io/badge/status-implementation--ready-green.svg)](https://github.com/talas9/clawdbot-swarm/blob/main/swarm-memory-implementation-plan.md)
 
 A hierarchical agent swarm memory architecture for ClawdBot/Moltbot self-modification.
@@ -11,12 +11,12 @@ A hierarchical agent swarm memory architecture for ClawdBot/Moltbot self-modific
 | Property | Value |
 |----------|-------|
 | **Name** | ClawdBot Swarm |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Repository** | [github.com/talas9/clawdbot-swarm](https://github.com/talas9/clawdbot-swarm) |
 | **Owner** | Mohammed Talas ([@talas9](https://github.com/talas9)) |
 | **License** | [MIT License](LICENSE) |
 | **Target** | ClawdBot/Moltbot self-modification |
-| **Estimated Implementation** | 4-6 hours (autonomous execution) |
+| **Estimated Implementation** | 5-7 hours (autonomous execution) |
 | **Language** | TypeScript, Markdown |
 | **Category** | AI Agent Architecture, Memory Systems |
 
@@ -49,6 +49,7 @@ clawdbot-swarm/
 │   └── metrics/                        # Performance metrics
 └── skills/swarm-memory/                # Skill root
     ├── SKILL.md                        # Entry point
+    ├── router.md                       # Task classification rules
     ├── CSP1.md                         # Protocol specification
     ├── specialists/                    # Specialist agents
     │   ├── memory.md                   # Memory operations
@@ -73,7 +74,9 @@ clawdbot-swarm/
 
 | Phase | Description | Duration |
 |-------|-------------|----------|
-| **0** | Foundation - Create swarm skill directory and CSP/1 protocol | 15 min |
+| **0.1a** | Task Router (Soft) - Pattern-based task classification | 15 min |
+| **0.1b** | Task Router (Hard) - Code-based enforcement (optional) | 30 min |
+| **0.2-0.4** | Foundation - Swarm skill directory and CSP/1 protocol | 15 min |
 | **1** | Specialist Agents - Memory, File, Web, Tool specialists | 45 min |
 | **2** | Memory Tiers - Ultra-short, short, medium, long-term memory | 60 min |
 | **3** | Orchestrator Modifications - Role hierarchy and delegation | 45 min |
@@ -82,7 +85,7 @@ clawdbot-swarm/
 | **6** | Integration & Testing - End-to-end validation | 45 min |
 | **7** | Bootstrapping - Self-application of capabilities | Ongoing |
 
-**Total Estimated Time:** 4-6 hours (autonomous execution)
+**Total Estimated Time:** 5-7 hours (autonomous execution)
 
 ## Quick Start
 
