@@ -187,31 +187,35 @@ await graphiti.add_episode(
 
 **Search for entities:**
 ```python
-results = await graphiti.search_entities(
+results = await graphiti.search(
     query="authentication dependencies",
-    num_results=10
+    num_results=10,
+    center_node_uuid=None  # Optional: search from specific node
 )
-# Returns: List of entity nodes with relevance scores
+# Returns: List of entities and facts with relevance scores
 ```
 
 **Search for relationships:**
 ```python
-results = await graphiti.search_edges(
+# Note: Graphiti search() returns both entities and edges
+results = await graphiti.search(
     query="auth token dependencies",
     num_results=10,
-    group_ids=["project_id"]  # Optional filtering
+    center_node_uuid=None
 )
-# Returns: List of edges with source/target entities
+# Returns: Combined entities and facts (extract edges from results)
 ```
 
 **Get entity neighborhood:**
 ```python
-context = await graphiti.build_context(
-    entity_names=["auth.ts"],
-    max_facts=20,
-    center_node_uuid="<entity_uuid>"
+# Graphiti doesn't have build_context() - use search() from specific node
+context = await graphiti.search(
+    query="auth.ts",
+    num_results=20,
+    center_node_uuid="<entity_uuid>"  # Search from this entity
 )
-# Returns: Subgraph of related entities and relationships
+# Returns: Related entities and facts within search radius
+# Assemble subgraph manually from search results
 ```
 
 ## Constraints
