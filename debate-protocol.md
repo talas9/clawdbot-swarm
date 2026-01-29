@@ -60,11 +60,18 @@ DEBATE_FAILURE REQ:<task> ATTEMPTS:[attempt1, attempt2] ERRORS:[error1, error2]
 
 ### Synthesis Response (Orchestrator)
 ```
-RESOLUTION <PROCEED|MODIFY|ESCALATE>
+RESOLUTION <PROCEED|MODIFY|RETRY|PIVOT|ESCALATE>
 RATIONALE <one_sentence_explanation>
-MODIFICATIONS [list_of_changes_if_MODIFY]
-NEXT_ATTEMPT_LIMIT <1-2_if_MODIFY>
+MODIFICATIONS [list_of_changes] | NEXT_APPROACH <description> | ESCALATE_TO <human>
+NEXT_ATTEMPT_LIMIT <1-2_if_MODIFY_or_RETRY>
 ```
+
+**Resolution Types:**
+- `PROCEED`: Accept plan as-is (Critic found no blocking issues)
+- `MODIFY`: Accept plan with specified changes
+- `RETRY`: Same approach with tactical adjustments (failure debates)
+- `PIVOT`: Fundamentally different approach required (failure debates)
+- `ESCALATE`: Human intervention needed
 
 ## Debate Flow
 
@@ -124,6 +131,125 @@ HH:MM DEBATE_FAILURE task:"<task_summary>" attempt:<n>
   Resolution: RETRY|PIVOT|ESCALATE
   Next approach: "<description>" or "human takeover"
 ```
+
+## Implementation Specifications
+
+### Task ID Hashing Strategy
+
+**Hash function:** SHA-256 (first 16 chars for brevity)
+
+**Canonicalization before hashing:**
+1. Lowercase all text
+2. Remove punctuation except hyphens/underscores
+3. Normalize whitespace to single spaces
+4. Stem common verbs (fix → fix, fixing → fix, fixed → fix)
+
+**Example:**
+```
+"Fix the authentication test" → "fix authentication test" → SHA-256 → "a3f2c1..."
+```
+
+**Semantic collision handling:**
+- Tasks that differ only in punctuation/casing are treated as same task (intended)
+- Tasks with fundamentally different goals but similar phrasing get different hashes
+- If uncertain, the Orchestrator can query user: "Is this the same task as before?"
+
+### Sub-Agent Invocation Mechanics
+
+**Model:** Same model as Orchestrator (inheritance)
+
+**Invocation:** Sequential (Advocate first, then Critic with Advocate's response in context)
+
+**Context window:**
+- Advocate receives: Debate request + last 2 task attempts (if failure debate)
+- Critic receives: Debate request + Advocate response + router context
+- Orchestrator receives: All of the above for synthesis
+
+**Response limits:**
+- Advocate: 500 tokens max
+- Critic: 500 tokens max
+- Synthesis: 200 tokens max
+
+### Synthesis Judgment Criteria
+
+**"Substantial" DIFF_FROM_PREVIOUS:**
+- Changes core approach (e.g., "use caching" vs "optimize query")
+- Adds new tool/library/method
+- NOT substantial: typo fixes, minor parameter tweaks
+
+**"Actionable" COUNTER:**
+- Identifies specific risk with mitigation suggestion
+- Cites precedent or known failure mode
+- NOT actionable: vague concerns like "might not work"
+
+**If ambiguous:** Orchestrator applies LLM judgment with bias toward accepting substantial diffs and actionable counters (false positives are safer than false negatives in debates).
+
+### Error Fingerprinting
+
+**Error identity for failure tracking:**
+- Error code (if present) + first 50 chars of error message
+- Normalized: lowercased, remove file paths/line numbers
+
+**Examples (same error):**
+```
+"ENOENT: no such file or directory, open '/path/to/file.txt'"
+"ENOENT: no such file or directory, open '/other/path/file.txt'"
+→ Fingerprint: "enoent no such file or directory open"
+```
+
+**Examples (different errors):**
+```
+"ENOENT: file not found" → "enoent file not found"
+"EACCES: permission denied" → "eacces permission denied"
+→ Different fingerprints, no pattern detected
+```
+
+### Staleness Reset Logic
+
+**Reset failure count when:**
+1. Task succeeds (obvious)
+2. User says "try different approach" / "start fresh" / "ignore previous attempts"
+3. **Significant context change:**
+   - New information provided (user adds details not present before)
+   - Environment changed (user says "I fixed X", "updated Y")
+   - Task goal evolves (user refines request substantially)
+
+**NOT reset by:**
+- Pure time passage alone (24h is guideline, not automatic)
+- Rephrasing same request
+- User frustration without new information
+
+### Cost Considerations
+
+**Token multiplier per debate:**
+- Planning debate: ~1,500-2,000 tokens (Advocate 500 + Critic 500 + Orchestrator context 500-1,000)
+- Failure debate: ~2,000-2,500 tokens (includes previous attempts in context)
+
+**Frequency estimates (typical session):**
+- High-stakes triggers: 10-20% of tasks
+- Failure triggers: 5-10% of tasks
+- Combined: ~15-30% overhead on API costs
+
+**Mitigation:**
+- Bypass rules eliminate ~70% of potential debates
+- User can disable debates per session: `DISABLE_DEBATE` flag
+- Adaptive depth: Reduce rounds for medium-stakes (future enhancement)
+
+### Performance Monitoring
+
+**Track in `memory/debate-metrics.jsonl`:**
+```json
+{"debate_id": "abc123", "type": "planning", "task": "delete-cache", "resolution": "PROCEED", "outcome": "success", "helped": false}
+{"debate_id": "def456", "type": "failure", "task": "fix-auth", "resolution": "PIVOT", "outcome": "success", "helped": true}
+```
+
+**Metrics to analyze:**
+- Debate frequency by category
+- MODIFY/RETRY/PIVOT effectiveness (did it work?)
+- False positive rate (debate triggered but wasn't needed)
+- Auto-escalation frequency
+
+**Review cadence:** Weekly (Phase 5 maintenance routine)
 
 ## Failure Tracking State
 

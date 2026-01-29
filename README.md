@@ -89,7 +89,7 @@ clawdbot-swarm/
 | **6** | Integration & Testing - End-to-end validation | 45 min |
 | **7** | Bootstrapping - Self-application of capabilities | Ongoing |
 
-**Total Estimated Time:** 5.75-7.75 hours (autonomous execution)
+**Total Estimated Time:** 5.33-7.33 hours (autonomous execution)
 
 **New in this version:** Phase 2.5 adds a two-agent debate system that prevents confirmation bias before high-stakes operations and breaks failure loops after repeated errors.
 

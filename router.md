@@ -129,7 +129,7 @@ Debate is a conditional layer — not every task needs it. These triggers determ
 
 ### Debate Bypass (never debate)
 
-- Read-only operations (search, list, cat, grep without -i)
+- Read-only operations (search, list, cat, grep, find)
 - Trivial commands (pwd, date, whoami, echo)
 - User said "just do it", "skip confirmation", "I'm sure"
 - Task already debated this session (don't re-debate same decision)

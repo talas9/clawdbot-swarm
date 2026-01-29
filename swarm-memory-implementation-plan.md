@@ -547,7 +547,7 @@ Add to your `~/.clawdbot/clawdbot.json`:
 
 ---
 
-## PHASE 2.5: DIALECTIC LAYER (45 min)
+## PHASE 2.5: DIALECTIC LAYER (50 min)
 
 ### Purpose
 
@@ -637,7 +637,7 @@ Add after "## Task Request Format":
 - [ ] Failure debate triggers after exactly 2 failures
 - [ ] Auto-escalate triggers after 3 failures
 - [ ] Debate logs appear in `memory/YYYY-MM-DD.md`
-- [ ] Synthesis produces valid `PROCEED|MODIFY|ESCALATE`
+- [ ] Synthesis produces valid `PROCEED|MODIFY|RETRY|PIVOT|ESCALATE`
 
 ### Test Scenarios
 
@@ -1266,11 +1266,11 @@ SNIPPET "brief text"
 | 0: Foundation | 15 min | 15 min |
 | 1: Specialists | 45 min | 1 hr |
 | 2: Memory Tiers | 60 min | 2 hr |
-| **2.5: Dialectic Layer** | **45 min** | **2 hr 45 min** |
-| 3: Orchestrator | 45 min | 3 hr 30 min |
-| 4: Parser | 30 min | 4 hr |
-| 5: Maintenance | 30 min | 4 hr 30 min |
-| 6: Testing | 45 min | 5 hr 15 min |
+| **2.5: Dialectic Layer** | **50 min** | **2 hr 50 min** |
+| 3: Orchestrator | 45 min | 3 hr 35 min |
+| 4: Parser | 30 min | 4 hr 5 min |
+| 5: Maintenance | 30 min | 4 hr 35 min |
+| 6: Testing | 45 min | 5 hr 20 min |
 | 7: Bootstrapping | Ongoing | — |
 
 ---
