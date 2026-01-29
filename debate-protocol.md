@@ -30,10 +30,10 @@ Two-agent debate system that challenges assumptions before high-stakes actions a
         │ (Orchestrator)│
         └───────┬───────┘
                 │
-    ┌───────────┼───────────┐
-    ▼           ▼           ▼
- PROCEED     MODIFY    ESCALATE
-(as planned) (changes)  (to human)
+    ┌───────────┼───────────┼───────────┼───────────┐
+    ▼           ▼           ▼           ▼           ▼
+ PROCEED     MODIFY      RETRY       PIVOT    ESCALATE
+(as planned) (changes)  (try again) (new way) (to human)
 ```
 
 ## Debate Types
