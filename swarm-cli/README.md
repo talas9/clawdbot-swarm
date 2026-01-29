@@ -1,6 +1,21 @@
 # Swarm CLI - Implementation Utilities
 
+**The permanent home for all scripts and tools that don't require AI reasoning.**
+
 CLI tool for automating mechanical tasks in clawdbot-swarm implementation. Reduces AI workload by handling static generation, scaffolding, and validation.
+
+## Philosophy
+
+This CLI is designed to be the **permanent repository for all automation** that can be scripted:
+
+- **Deterministic operations:** UUID generation, hashing, file operations
+- **Template-based creation:** Scaffolding agents, skills, behaviors
+- **Batch operations:** Memory compression, metrics aggregation, bulk validation
+- **Static analysis:** Code checks, configuration validation, dependency audits
+
+**Rule of thumb:** If a task doesn't need reasoning or creativity, it belongs here as a script, not as AI work.
+
+As the swarm implementation evolves, new commands will be added to handle repetitive tasks, data transformations, and system maintenance that AI shouldn't waste tokens on.
 
 ## Installation
 
@@ -158,9 +173,45 @@ npm run swarm <command>
 
 ## Future Enhancements
 
-Potential additions as implementation progresses:
-- `swarm add-behavior <name>` - Add memory behavior with boilerplate
+**This CLI will grow with the swarm.** As new automation opportunities are identified, they'll be added as commands.
+
+### Planned Additions
+
+**Memory & Data:**
+- `swarm compress-memory` - Run memory compression/consolidation
+- `swarm metrics` - Analyze debate-metrics.jsonl, generate reports
+- `swarm graph-query <query>` - Query memory graph (episodic links)
+- `swarm export-memory --format json|csv` - Export memory for analysis
+
+**Development & Testing:**
 - `swarm test-flow <scenario>` - Test debate/routing flows
-- `swarm metrics` - Analyze debate-metrics.jsonl
-- `swarm compress-memory` - Run memory compression routine
+- `swarm add-behavior <name>` - Add memory behavior with boilerplate
 - `swarm sync-agent <name>` - Sync agent spec to running instance
+- `swarm benchmark <phase>` - Performance testing for phases
+
+**Batch Operations:**
+- `swarm reindex-memory` - Rebuild importance tiers
+- `swarm prune-old --days 30` - Clean up old episodic entries
+- `swarm migrate-schema <old> <new>` - Schema migrations
+- `swarm batch-task <file>` - Execute tasks from JSON/YAML
+
+**Analysis & Debugging:**
+- `swarm debug-routing <task>` - Show routing decision breakdown
+- `swarm trace-decision <task-id>` - Show full decision tree
+- `swarm conflict-check` - Detect memory contradictions
+- `swarm token-report` - Analyze token usage patterns
+
+### Contributing Scripts
+
+**When to add a new command:**
+1. Task is repetitive across phases
+2. Task is deterministic (no reasoning needed)
+3. Task involves batch/bulk operations
+4. Task is data transformation or validation
+
+**When NOT to add:**
+5. Task requires creative thinking
+6. Task needs context-dependent decisions
+7. Task is one-off without reuse potential
+
+**The goal:** Keep AI focused on high-value reasoning, offload everything else to scripts.

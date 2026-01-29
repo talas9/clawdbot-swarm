@@ -167,6 +167,8 @@ All inter-agent communication uses CSP/1. See CSP1.md.
 
 Create CLI tooling to automate mechanical tasks, reducing token costs during implementation. AI creates the tool, then uses it in subsequent phases for deterministic operations.
 
+**Long-term vision:** This CLI becomes the **permanent home for all scripts and tools** that don't require AI reasoning. As the swarm evolves, new automation commands will be added here for batch operations, data transformations, metrics analysis, and system maintenance—anything that's deterministic and doesn't need creative thinking.
+
 ### 0.5.1 Create CLI Project Structure (5 min)
 
 **Directory:** `swarm-cli/`
