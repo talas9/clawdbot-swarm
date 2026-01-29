@@ -62,11 +62,14 @@ await neo4j_client.addLink(e1, e2, weight, context)
 
 **After (Graphiti):**
 ```python
+from graphiti_core import EpisodeType
+
 # Episode-based ingestion (Graphiti extracts entities)
 await graphiti.add_episode(
-    name="auth-discussion",
+    name=f"auth-discussion_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
     episode_body="We discussed JWT refresh token race conditions...",
     source_description="Chat with user",
+    source=EpisodeType.message,
     reference_time=datetime.now()
 )
 

@@ -178,9 +178,13 @@ Graphiti uses a **temporal knowledge graph** where:
 
 **Add episode (auto-extracts entities/relations):**
 ```python
+from graphiti_core import EpisodeType
+
 await graphiti.add_episode(
-    content="The auth.ts file depends on token.ts for JWT refresh handling",
+    name=f"code_review_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+    episode_body="The auth.ts file depends on token.ts for JWT refresh handling",
     source_description="Code review session",
+    source=EpisodeType.text,
     reference_time=datetime.now()
 )
 ```

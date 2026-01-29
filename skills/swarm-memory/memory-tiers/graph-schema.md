@@ -101,7 +101,7 @@ Graphiti doesn't use explicit "weights" but calculates relevance via:
 **Text-based (auto-extraction):**
 ```python
 await graphiti.add_episode(
-    content="Fixed JWT refresh bug - auth.ts now checks expiry before rotation",
+    episode_body="Fixed JWT refresh bug - auth.ts now checks expiry before rotation",
     source_description="Code commit",
     reference_time=datetime.now(),
     group_id="project-auth"
@@ -113,7 +113,7 @@ await graphiti.add_episode(
 **Structured JSON (explicit entities):**
 ```python
 await graphiti.add_episode(
-    content={
+    episode_body={
         "entities": [
             {"name": "auth.ts", "type": "File"},
             {"name": "token.ts", "type": "File"}
@@ -179,7 +179,7 @@ context = await graphiti.search(
 # When new episode contradicts old information:
 # Graphiti automatically sets expired_at on old relation
 await graphiti.add_episode(
-    content="auth.ts no longer depends on token.ts, now uses jwt-utils.ts",
+    episode_body="auth.ts no longer depends on token.ts, now uses jwt-utils.ts",
     reference_time=datetime.now()
 )
 # Old relation marked as expired
@@ -308,7 +308,7 @@ If migrating from raw Neo4j to Graphiti:
    ```python
    for item in old_data:
        await graphiti.add_episode(
-           content=item["fact"],
+           episode_body=item["fact"],
            source_description="Migration",
            reference_time=item["created_at"]
        )

@@ -122,7 +122,7 @@ for entity in results:
 
 # Example: Mark fact as expired
 await graphiti.add_episode(
-    content="The dependency on token.ts is no longer valid",
+    episode_body="The dependency on token.ts is no longer valid",
     reference_time=datetime.now()
 )
 # Graphiti auto-sets expired_at on old relation
@@ -273,7 +273,7 @@ context = await graphiti.search(
 ```python
 # Text-based (auto-extraction)
 await graphiti.add_episode(
-    content="Fixed JWT refresh bug in auth.ts by adding expiry check",
+    episode_body="Fixed JWT refresh bug in auth.ts by adding expiry check",
     source_description="Code commit",
     reference_time=datetime.now(),
     group_id="project-auth"
@@ -281,7 +281,7 @@ await graphiti.add_episode(
 
 # Structured (explicit entities/relations)
 await graphiti.add_episode(
-    content={
+    episode_body={
         "entities": [
             {"name": "auth.ts", "type": "File"},
             {"name": "JWT refresh", "type": "Event"}
@@ -306,7 +306,7 @@ await graphiti.add_episode(
 ```python
 # Graphiti auto-extracts relations from text
 await graphiti.add_episode(
-    content="auth.ts now depends on jwt-utils.ts instead of token.ts",
+    episode_body="auth.ts now depends on jwt-utils.ts instead of token.ts",
     reference_time=datetime.now()
 )
 # Creates new relation + invalidates old one
@@ -315,7 +315,7 @@ await graphiti.add_episode(
 **Explicit via Structured Episodes:**
 ```python
 await graphiti.add_episode(
-    content={
+    episode_body={
         "relations": [
             {
                 "source": "auth.ts",
@@ -423,7 +423,7 @@ RETURN e1.name, type(r), e2.name, r.context, r.weight
 ```python
 for relation in old_relations:
     await graphiti.add_episode(
-        content=f"{relation['source']} {relation['type']} {relation['target']}. Context: {relation['context']}",
+        episode_body=f"{relation['source']} {relation['type']} {relation['target']}. Context: {relation['context']}",
         source_description="Migration from Neo4j",
         reference_time=relation['created_at']
     )
@@ -446,7 +446,7 @@ with jsonlines.open('memory/relations.jsonl') as reader:
     for entry in reader:
         # Convert to episode
         await graphiti.add_episode(
-            content=entry['fact'],
+            episode_body=entry['fact'],
             source_description="JSONL migration",
             reference_time=entry['timestamp']
         )

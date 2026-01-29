@@ -75,10 +75,14 @@ See [CSP1.md](CSP1.md) for full protocol specification.
 
 **Graphiti Architecture:**
 ```python
+from graphiti_core import EpisodeType
+
 # Add episode (text or structured)
 await graphiti.add_episode(
-    content="Fixed JWT refresh bug in auth.ts by adding expiry check",
+    name=f"commit_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+    episode_body="Fixed JWT refresh bug in auth.ts by adding expiry check",
     source_description="Code commit",
+    source=EpisodeType.text,
     reference_time=datetime.now()
 )
 # Graphiti auto-extracts: auth.ts (File), JWT (Concept), bug (Event)
